@@ -100,12 +100,12 @@ const Entrypage = () => {
     setShowDidYouKnow(false);
   };
 
-  // ✅ Play tick sound whenever a card is clicked
+
   const Clickedimage = (index: number) => {
     if (flipCard.includes(index) || flipCard.length < 2) {
       if (tickSound) {
-        tickSound.currentTime = 0; // restart the sound each click
-        tickSound.play().catch(() => {}); // prevent console errors
+        tickSound.currentTime = 0; 
+        tickSound.play().catch(() => {}); 
       }
       setflipCard([...flipCard, index]);
     }

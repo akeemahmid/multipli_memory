@@ -32,19 +32,36 @@ const Entrypage = () => {
     "/assest/patil.jpg",
   ];
 
-  const CARDS_PER_ROUND = 8;
-  const totalRounds = Math.ceil(allCards.length / CARDS_PER_ROUND);
+
+  const [cardsPerRound, setCardsPerRound] = useState(8);
+
+  useEffect(() => {
+    const updateCardsPerRound = () => {
+      if (window.innerWidth < 768) {
+        setCardsPerRound(6); 
+      } else {
+        setCardsPerRound(8); 
+      }
+    };
+
+    updateCardsPerRound(); 
+    window.addEventListener("resize", updateCardsPerRound);
+
+    return () => window.removeEventListener("resize", updateCardsPerRound);
+  }, []);
+
+  const totalRounds = Math.ceil(allCards.length / cardsPerRound);
 
   const generateCards = (round: number) => {
-    const start = round * CARDS_PER_ROUND;
-    const end = start + CARDS_PER_ROUND;
+    const start = round * cardsPerRound;
+    const end = start + cardsPerRound;
     const selectedCards = allCards.slice(start, end);
     const deck = [...selectedCards, ...selectedCards];
     return deck.sort(() => Math.random() - 0.5);
   };
 
   const [round, setRound] = useState(0);
-  const [cards, setCards] = useState<string[]>(generateCards(0));
+  const [cards, setCards] = useState<string[]>([]);
   const [flipCard, setflipCard] = useState<number[]>([]);
   const [solved, setSolved] = useState<number[]>([]);
   const [showDidYouKnow, setShowDidYouKnow] = useState(true);
@@ -57,8 +74,13 @@ const Entrypage = () => {
   const [timeLeft, setTimeLeft] = useState(50);
   const [timeUp, setTimeUp] = useState(false);
 
+  const tickSound =
+    typeof Audio !== "undefined" ? new Audio("/assest/tick.mp3") : null;
 
-  const tickSound = typeof Audio !== "undefined" ? new Audio("/assest/tick.mp3") : null;
+
+  useEffect(() => {
+    setCards(generateCards(round));
+  }, [cardsPerRound, round]);
 
   useEffect(() => {
     if (solved.length === cards.length) return;
@@ -100,12 +122,11 @@ const Entrypage = () => {
     setShowDidYouKnow(false);
   };
 
-
   const Clickedimage = (index: number) => {
     if (flipCard.includes(index) || flipCard.length < 2) {
       if (tickSound) {
-        tickSound.currentTime = 0; 
-        tickSound.play().catch(() => {}); 
+        tickSound.currentTime = 0;
+        tickSound.play().catch(() => {});
       }
       setflipCard([...flipCard, index]);
     }
@@ -122,12 +143,22 @@ const Entrypage = () => {
       setTimeLeft(60);
       setTimeUp(false);
     } else {
+ 
       setRound(nextRound);
+
+      setShowDidYouKnow(true);
+      setflipCard([]);
+      setSolved([]);
+      setTimeUp(false);
+      setTimeLeft(0);
     }
   };
 
-  const gameOver = solved.length === cards.length;
+
   const allRoundsCompleted = round >= totalRounds;
+
+  const gameOver =
+    (cards.length > 0 && solved.length === cards.length) || allRoundsCompleted;
 
   return (
     <div className="text-center relative">
@@ -190,7 +221,7 @@ const Entrypage = () => {
               </button>
             </div>
           ) : showDidYouKnow ? (
-            <div className="relative z-10 flex flex-col items-center justify-center space-y-9 bg-[#3e3170b3] w-auto md:w-[350px] md:h-[340px] rounded-3xl p-6 shadow-lg">
+            <div className="relative z-10 flex flex-col items-center space-y-9 bg-[#3e3170b3] w-auto md:w-[350px] md:h-[340px] rounded-3xl p-6 shadow-lg">
               <h2 className="text-green-400 font-semibold text-2xl">
                 {allRoundsCompleted
                   ? "🎉 Congratulations! You completed all rounds!"
@@ -258,11 +289,11 @@ const Entrypage = () => {
       <h3 className="mb-5 font-bold text-xl md:text-3xl">
         Multipli Memory Game — Round {round + 1}
       </h3>
-      <div className="grid grid-cols-4 md:grid-cols-4 gap-3 bg-[#3E3170] p-3">
+      <div className="grid grid-cols-3 md:grid-cols-4 gap-3 bg-[#3E3170] p-3">
         {cards.map((card, index) => (
           <div
             key={index}
-            className={`w-[80px] h-[80px] md:h-28 md:w-28 text-4xl font-bold text-[#3E3170] cursor-pointer transform bg-slate-200 flex justify-center items-center transition-transform duration-300 ${
+            className={`w-[90px] h-[90px] md:h-28 md:w-28 text-4xl font-bold text-[#3E3170] cursor-pointer transform bg-slate-200 flex justify-center items-center transition-transform duration-300 ${
               flipCard.includes(index) || solved.includes(index)
                 ? "rotate-180"
                 : ""

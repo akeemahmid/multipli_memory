@@ -71,7 +71,7 @@ const Entrypage = () => {
   const [moregame, setMoregame] = useState(false);
   const [showLearnMoreBox, setShowLearnMoreBox] = useState(false);
 
-  const [timeLeft, setTimeLeft] = useState(50);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [timeUp, setTimeUp] = useState(false);
 
   const tickSound =

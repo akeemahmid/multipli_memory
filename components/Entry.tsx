@@ -106,7 +106,7 @@ const Entrypage = () => {
     if (flipCard.length === 2) {
       setTimeout(() => {
         Mathchedcard();
-      }, 1000);
+      }, 500);
     }
   }, [cards, flipCard, solved]);
 
